@@ -1,8 +1,9 @@
-import { ScrollView, Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 import { Card } from "react-native-elements";
 import { useSelector } from "react-redux";
 import { baseUrl } from "../shared/baseURL";
 import Loading from "../components/LoadingComponent";
+import { useEffect, useRef } from "react";
 
 const FeaturedItem = (props) => {
   const { item } = props;
@@ -46,15 +47,23 @@ const HomeScreen = () => {
   const campsites = useSelector((state) => state.campsites);
   const promotions = useSelector((state) => state.promotions);
   const partners = useSelector((state) => state.partners);
-
+  const scaleValue = useRef(new Animated.Value(0)).current; // Initial value for scaling animation
+  const scaleAnimation = Animated.timing(scaleValue, {
+    toValue: 1,
+    duration: 2000,
+    delay: 1000,
+    useNativeDriver: true,
+  });
   const featCampsite = campsites.campsitesArray.find((item) => item.featured);
   const featPromotion = promotions.promotionsArray.find(
     (item) => item.featured
   );
   const featPartner = partners.partnersArray.find((item) => item.featured);
-
+  useEffect(() => {
+    scaleAnimation.start();
+  }, []);
   return (
-    <ScrollView>
+    <Animated.ScrollView style={{ transform: [{ scale: scaleValue }] }}>
       <FeaturedItem
         item={featCampsite}
         isLoading={campsites.isLoading}
@@ -70,7 +79,7 @@ const HomeScreen = () => {
         isLoading={partners.isLoading}
         errMess={partners.errMess}
       />
-    </ScrollView>
+    </Animated.ScrollView>
   );
 };
 
